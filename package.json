@@ -10,7 +10,9 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "discord.js": "^12.5.2",
+    "express": "^4.17.1",
+    "querystring": "^0.2.1"
   },
   "engines": {
     "node": "12.x"
