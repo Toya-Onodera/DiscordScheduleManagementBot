@@ -1,71 +1,55 @@
-const http = require('http');
-const querystring = require('querystring');
-const discord = require('discord.js');
-const client = new discord.Client();
+import {Client} from "discord.js";
+import dotenv from "dotenv";
+import dayjs from "dayjs";
+import "dayjs/locale/ja";
 
-http.createServer(function(req, res){
-    if (req.method == 'POST'){
-        var data = "";
-        req.on('data', function(chunk){
-            data += chunk;
-        });
-        req.on('end', function(){
-            if(!data){
-                console.log("No post data");
-                res.end();
-                return;
-            }
-            var dataObject = querystring.parse(data);
-            console.log("post:" + dataObject.type);
-            if(dataObject.type == "wake"){
-                console.log("Woke up in post");
-                res.end();
-                return;
-            }
-            res.end();
-        });
-    }
-    else if (req.method == 'GET'){
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end('Discord Bot is active now\n');
-    }
-}).listen(3000);
+const client = new Client({disableEveryone: true});
+dotenv.config();
+dayjs.locale("ja");
 
-client.on('ready', message =>{
-    console.log('Bot準備完了～');
-    client.user.setPresence({ activity: { name: 'げーむ' } });
-});
+const toNextWeekends = () => {
+    const japanNowDate = dayjs();
+    const weekends = [6, 7];
 
-client.on('message', message =>{
-    if (message.author.id == client.user.id){
-        return;
-    }
-    if(message.isMemberMentioned(client.user)){
-        sendReply(message, "呼びましたか？");
-        return;
-    }
-    if (message.content.match(/にゃ～ん|にゃーん/)){
-        let text = "にゃ～ん";
-        sendMsg(message.channel.id, text);
-        return;
-    }
-});
+    return weekends.map((d, n) => {
+        // 日曜日だったら次の週末を提示する
+        const diffDay = d - japanNowDate.day();
+        const targetDate = japanNowDate.add(diffDay, "day");
 
-if(process.env.DISCORD_BOT_TOKEN == undefined){
-    console.log('DISCORD_BOT_TOKENが設定されていません。');
+        return `${n + 1}: ${targetDate.format("YYYY/MM/DD(ddd)")}`;
+    }).join("\n");
+};
+
+if (process.env.DISCORD_BOT_TOKEN === undefined) {
+    console.log("DISCORD_BOT_TOKEN does not exist.");
     process.exit(0);
 }
 
-client.login( process.env.DISCORD_BOT_TOKEN );
+client.on("ready", () => {
+    console.log("This bot is running...");
 
-function sendReply(message, text){
-    message.reply(text)
-        .then(console.log("リプライ送信: " + text))
-        .catch(console.error);
-}
+    // Bot オンラインであれば、「Bot をプレイ中と表示される」
+    client.user.setPresence({activity: {name: "Bot"}});
+});
 
-function sendMsg(channelId, text, option={}){
-    client.channels.get(channelId).send(text, option)
-        .then(console.log("メッセージ送信: " + text + JSON.stringify(option)))
-        .catch(console.error);
-}
+client.on("message", async (message) => {
+    // 自分のメッセージには反応しないようにする
+    if (message.author.bot) {
+        return;
+    }
+
+    // メンションされる & @everyone や @here ではない & 単独メンションのときに動作する
+    if ((message.mentions.users.find((e) => e.username === client.user.username) && message.mentions.users.array().length === 1)
+        || (message.mentions.roles.find((e) => e.name === client.user.username) && message.mentions.roles.array().length === 1)) {
+        const sentMessage = await message.channel.send(`@everyone \n${toNextWeekends()}`);
+        try {
+            await sentMessage.react("1️⃣");
+            await sentMessage.react("2️⃣");
+            await sentMessage.react("❌");
+        } catch (err) {
+            console.error(err);
+        }
+    }
+});
+
+client.login(process.env.DISCORD_BOT_TOKEN);
