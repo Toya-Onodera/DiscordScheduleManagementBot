@@ -1,11 +1,15 @@
+import http from "http";
 import {Client} from "discord.js";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
 import "dayjs/locale/ja";
 
+/******************** Discord Bot ********************/
 const client = new Client({disableEveryone: true});
 dotenv.config();
 dayjs.locale("ja");
+
+const connectDiscord = () => client.login(process.env.DISCORD_BOT_TOKEN);
 
 const toNextWeekends = () => {
     const japanNowDate = dayjs();
@@ -23,6 +27,10 @@ const toNextWeekends = () => {
 if (process.env.DISCORD_BOT_TOKEN === undefined) {
     console.log("DISCORD_BOT_TOKEN does not exist.");
     process.exit(0);
+}
+
+else {
+    connectDiscord();
 }
 
 client.on("ready", () => {
@@ -52,4 +60,8 @@ client.on("message", async (message) => {
     }
 });
 
-client.login(process.env.DISCORD_BOT_TOKEN);
+/******************** Node Server ********************/
+const httpServer = http.createServer();
+httpServer.on("request", () => {
+    connectDiscord();
+});

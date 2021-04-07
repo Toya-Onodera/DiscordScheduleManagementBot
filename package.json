@@ -5,9 +5,9 @@
   "name": "DiscordScheduleManagementBot",
   "version": "1.0.0",
   "description": "A simple Node app built on Express, instantly up and running.",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "babel-node server.js"
+    "start": "babel-node src/server.js"
   },
   "dependencies": {
     "@babel/core": "^7.13.14",
