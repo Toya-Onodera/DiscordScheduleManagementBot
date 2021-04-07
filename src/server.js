@@ -33,7 +33,7 @@ else {
     connectDiscord();
 }
 
-client.on("ready", () => {
+client.once("ready", () => {
     console.log("This bot is running...");
 
     // Bot オンラインであれば、「Bot をプレイ中と表示される」
@@ -62,6 +62,11 @@ client.on("message", async (message) => {
 
 /******************** Node Server ********************/
 const httpServer = http.createServer();
-httpServer.on("request", () => {
+
+httpServer.on("request", (request, response) => {
     connectDiscord();
+    response.writeHead(200, { "Content-Type": "text/plain" });
+    response.end("Discord bot is active now \n");
 });
+
+httpServer.listen(3000);
