@@ -13,7 +13,7 @@ const connectDiscord = () => client.login(process.env.DISCORD_BOT_TOKEN);
 
 const toNextWeekends = () => {
     const japanNowDate = dayjs();
-    const weekends = [6, 7];
+    const weekends = [5, 6, 7];
 
     return weekends.map((d, n) => {
         // 日曜日だったら次の週末を提示する
@@ -53,6 +53,7 @@ client.on("message", async (message) => {
         try {
             await sentMessage.react("1️⃣");
             await sentMessage.react("2️⃣");
+            await sentMessage.react("3️⃣");
             await sentMessage.react("❌");
         } catch (err) {
             console.error(err);
