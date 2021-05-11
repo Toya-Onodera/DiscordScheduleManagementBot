@@ -8,8 +8,9 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "babel-node src/server.js",
-    "debug": "npx ts-node src/index.ts"
+    "start": "node build/index.js",
+    "debug": "npx ts-node src/index.ts",
+    "compile": "npx tsc"
   },
   "dependencies": {
     "@babel/core": "^7.13.14",
