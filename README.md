@@ -1,5 +1,5 @@
 # DiscordScheduleManagementBot
-<img width="435" alt="Bot のイメージ図" src="https://user-images.githubusercontent.com/11432913/115187357-26fae600-a11e-11eb-9638-ff8c59a3cdef.png">
+<img alt="Bot のイメージ図" src="https://user-images.githubusercontent.com/11432913/117841978-77e2a200-b2b8-11eb-8be6-086bb5c9dbc3.gif">
 
 ## 概要
 Discord 上で簡易的なスケジュール管理が行える Bot です。  
