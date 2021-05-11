@@ -35,7 +35,7 @@ class DiscordBot {
                 return;
             }
             if ((message.mentions.users.find((e) => e.username === this.client.user.username) && message.mentions.users.array().length === 1) || (message.mentions.roles.find((e) => e.name === this.client.user.username) && message.mentions.roles.array().length === 1)) {
-                const sentMessage = await message.channel.send(`@everyone \n${this.toNextWeekends()}`);
+                const sentMessage = await message.channel.send(`@everyone \n${this.createNextSchedules(message.content)}`);
                 try {
                     await sentMessage.react("1️⃣");
                     await sentMessage.react("2️⃣");
@@ -51,14 +51,18 @@ class DiscordBot {
     connectDiscord() {
         this.client.login(process.env.DISCORD_BOT_TOKEN);
     }
-    toNextWeekends() {
+    createNextSchedules(content) {
+        const removeMentionsContent = content.replace(/<@![0-9]*>/g, "").trim();
         const japanNowDate = dayjs_1.default();
         const weekends = [5, 6, 7];
-        return weekends.map((d, n) => {
+        const weekendsText = weekends.map((d, n) => {
             const diffDay = d - japanNowDate.day();
             const targetDate = japanNowDate.add(diffDay, "day");
             return `${n + 1}: ${targetDate.format("YYYY/MM/DD(ddd)")}`;
         }).join("\n");
+        return (removeMentionsContent.length)
+            ? `やりたいこと**「${removeMentionsContent}」**\n${weekendsText}`
+            : weekendsText;
     }
 }
 exports.discordBot = new DiscordBot();
