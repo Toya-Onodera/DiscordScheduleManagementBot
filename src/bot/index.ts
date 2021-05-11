@@ -49,7 +49,7 @@ class DiscordBot {
             // メンションされる & @everyone や @here ではない & 単独メンションのときに動作する
             // @ts-ignore
             if ((message.mentions.users.find((e) => e.username === this.client.user.username) && message.mentions.users.array().length === 1) || (message.mentions.roles.find((e) => e.name === this.client.user.username) && message.mentions.roles.array().length === 1)) {
-                const sentMessage = await message.channel.send(`@everyone \n${this.toNextWeekends()}`);
+                const sentMessage = await message.channel.send(`@everyone \n${this.createNextSchedules(message.content)}`);
                 try {
                     await sentMessage.react("1️⃣");
                     await sentMessage.react("2️⃣");
@@ -66,17 +66,26 @@ class DiscordBot {
         this.client.login(process.env.DISCORD_BOT_TOKEN);
     }
 
-    toNextWeekends(): string {
+    createNextSchedules(content: string): string {
+        // やりたいことが明記されていたら文章を作成する
+        // メンションは「<@![数桁の半角数字]*> コメント」で構成される
+        const removeMentionsContent = content.replace(/<@![0-9]*>/g, "").trim();
+
+        // 週末の文字列を作成する
         const japanNowDate = dayjs();
         const weekends = [5, 6, 7];
 
-        return weekends.map((d, n) => {
+        const weekendsText =  weekends.map((d, n) => {
             // 日曜日だったら次の週末を提示する
             const diffDay = d - japanNowDate.day();
             const targetDate = japanNowDate.add(diffDay, "day");
 
             return `${n + 1}: ${targetDate.format("YYYY/MM/DD(ddd)")}`;
         }).join("\n");
+
+        return (removeMentionsContent.length)
+            ? `やりたいこと**「${removeMentionsContent}」**\n${weekendsText}`
+            : weekendsText;
     }
 }
 
